@@ -12,20 +12,27 @@ See `pyproject.toml` for the detail of dependency requirements.
 
 ## Usage
 
-For Crello dataset revision 5.0.0:
+For Crello dataset 5.0.0:
 
 ```python
 import datasets
+import huggingface_hub
 from cr_renderer import CrelloV5Renderer
 
 dataset = datasets.load_dataset(
     "cyberagent/crello", revision="5.0.0", split="train")
-renderer = CrelloV5Renderer(dataset.features)
+fonts_path = huggingface_hub.hf_hub_download(
+    repo_id="cyberagent/crello",
+    filename="resources/fonts.pickle",
+    repo_type="dataset",
+    revision="5.0.0",
+)
+renderer = CrelloV5Renderer(dataset.features, fonts_path)
 for example in dataset:
     image_bytes = renderer.render(example)
 ```
 
-For Crello dataset revision 4.0.0:
+For Crello dataset 4.0.0:
 
 ```python
 import datasets

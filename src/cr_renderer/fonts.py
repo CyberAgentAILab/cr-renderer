@@ -42,17 +42,13 @@ class FontManager(object):
         self._fonts: Optional[FontDict] = None
 
         if input_path is None:
-            input_path = self._fetch_fonts_from_hub()
+            input_path = huggingface_hub.hf_hub_download(
+                repo_id=_OPENCOLE_REPOSITORY,
+                filename=_OPENCOLE_FONTS_PATH,
+                repo_type="dataset",
+            )
 
         self.load(input_path)
-
-    def _fetch_fonts_from_hub(self) -> str:
-        """Load fonts."""
-        return huggingface_hub.hf_hub_download(
-            repo_id=_OPENCOLE_REPOSITORY,
-            filename=_OPENCOLE_FONTS_PATH,
-            repo_type="dataset",
-        )
 
     def save(self, output_path: str) -> None:
         """Save fonts to a pickle file."""

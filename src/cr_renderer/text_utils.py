@@ -85,18 +85,25 @@ def make_default_map(
     return [TextMapItem(startIndex=0, endIndex=length - 1, type=type, value=value)]
 
 
-def expand_map(
+def make_dense_map(
     m: Optional[List[TextMapItem]], text_length: int, default: Any = None
-) -> Iterator[Any]:
+) -> List[Any]:
+    """Make a dense map from a run-length array."""
     if m is None:
         m = make_default_map(text_length, default)
-    return itertools.chain.from_iterable(
-        itertools.repeat(
-            x.value,
-            x.endIndex - x.startIndex + 1,
-        )
-        for x in m
-    )
+
+    x = [default] * text_length
+    invalid_flag = False
+    for item in m:
+        for i in range(item.startIndex, item.endIndex + 1):
+            if i < text_length:
+                x[i] = item.value
+            else:
+                invalid_flag = True
+
+    if invalid_flag:
+        logger.debug(f"Invalid run length array {m=} for {text_length=}")
+    return x
 
 
 def generate_map(values: List[Any], type: Optional[str] = None) -> List[TextMapItem]:
@@ -140,14 +147,14 @@ def make_text_spans(element: TextProperty) -> Iterator[List[TextSpan]]:
     style_map = list(
         map(
             TextSpanStyle,
-            expand_map(element.colorMap, text_length),
-            expand_map(element.boldMap, text_length, False),
-            expand_map(element.italicMap, text_length, False),
-            expand_map(element.linkMap, text_length, None),
-            expand_map(element.opacityMap, text_length, 1.0),
-            expand_map(element.underlineMap, text_length, None),
-            expand_map(element.weightMap, text_length, 400),
-            expand_map(element.styleMap, text_length, "regular"),
+            make_dense_map(element.colorMap, text_length),
+            make_dense_map(element.boldMap, text_length, False),
+            make_dense_map(element.italicMap, text_length, False),
+            make_dense_map(element.linkMap, text_length, None),
+            make_dense_map(element.opacityMap, text_length, 1.0),
+            make_dense_map(element.underlineMap, text_length, None),
+            make_dense_map(element.weightMap, text_length, 400),
+            make_dense_map(element.styleMap, text_length, "regular"),
         )
     )
 

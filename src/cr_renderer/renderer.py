@@ -52,11 +52,12 @@ class CrelloV5Renderer(_BaseRenderer):
         example: Dict[str, Any],
         max_size: int = 360,
         render_text: bool = True,
+        format: str = "jpeg",
     ) -> bytes:
         """Render a preprocessed example and return as JPEG bytes."""
         example = _decode_class_label(self.features, example)
         # TODO: validate the example against the pydantic schema.
-        return _render_to_surface(self.font_manager, example, max_size, render_text)
+        return _render_to_surface(self.font_manager, example, max_size, render_text, format)
 
 
 class CrelloV4Renderer(_BaseRenderer):
@@ -79,11 +80,12 @@ class CrelloV4Renderer(_BaseRenderer):
         example: Dict[str, Any],
         max_size: int = 360,
         render_text: bool = True,
+        format: str = "jpeg",
     ) -> bytes:
         """Render a preprocessed example and return as JPEG bytes."""
         example = _decode_class_label(self.features, example)
         example = self.convert_to_v5(example)
-        return _render_to_surface(self.font_manager, example, max_size, render_text)
+        return _render_to_surface(self.font_manager, example, max_size, render_text, format)
 
     @staticmethod
     def convert_to_v5(example: Dict[str, Any]) -> Dict[str, Any]:
@@ -161,6 +163,7 @@ def _render_to_surface(
     example: Dict[str, Any],
     max_size: int,
     render_text: bool = True,
+    format: str = "jpeg",
 ) -> bytes:
     """Render an example to a surface and return as JPEG bytes."""
     canvas_width = example["canvas_width"]
@@ -207,7 +210,7 @@ def _render_to_surface(
                     dst = skia.Rect(example["width"][i], example["height"][i])
                     paint = skia.Paint(Alphaf=example["opacity"][i], AntiAlias=True)
                     canvas.drawImageRect(image, src, dst, paint=paint)
-    return image_utils.encode_surface(surface, "jpeg")
+    return image_utils.encode_surface(surface, format)
 
 
 def _get_scale_size(

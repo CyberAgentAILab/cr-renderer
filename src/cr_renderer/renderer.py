@@ -53,11 +53,12 @@ class CrelloV5Renderer(_BaseRenderer):
         max_size: int = 360,
         render_text: bool = True,
         format: str = "jpeg",
+        canvas_color: skia.Color4f | None = skia.ColorWHITE
     ) -> bytes:
         """Render a preprocessed example and return as JPEG bytes."""
         example = _decode_class_label(self.features, example)
         # TODO: validate the example against the pydantic schema.
-        return _render_to_surface(self.font_manager, example, max_size, render_text, format)
+        return _render_to_surface(self.font_manager, example, max_size, render_text, format, canvas_color)
 
 
 class CrelloV4Renderer(_BaseRenderer):
@@ -81,11 +82,12 @@ class CrelloV4Renderer(_BaseRenderer):
         max_size: int = 360,
         render_text: bool = True,
         format: str = "jpeg",
+        canvas_color: skia.Color4f | None = skia.ColorWHITE
     ) -> bytes:
         """Render a preprocessed example and return as JPEG bytes."""
         example = _decode_class_label(self.features, example)
         example = self.convert_to_v5(example)
-        return _render_to_surface(self.font_manager, example, max_size, render_text, format)
+        return _render_to_surface(self.font_manager, example, max_size, render_text, format, canvas_color)
 
     @staticmethod
     def convert_to_v5(example: Dict[str, Any]) -> Dict[str, Any]:
@@ -164,6 +166,7 @@ def _render_to_surface(
     max_size: int,
     render_text: bool = True,
     format: str = "jpeg",
+    canvas_color: skia.Color4f | None = skia.ColorWHITE
 ) -> bytes:
     """Render an example to a surface and return as JPEG bytes."""
     canvas_width = example["canvas_width"]
@@ -172,7 +175,11 @@ def _render_to_surface(
     surface = skia.Surface(size[0], size[1])
     with surface as canvas:
         canvas.scale(scale[0], scale[1])
-        canvas.clear(skia.ColorWHITE)
+
+        # if canvas_color is None, the background is transparent.
+        if canvas_color is not None:
+            canvas.clear(canvas_color)
+
         for i in range(example["length"]):
             with skia.AutoCanvasRestore(canvas):
                 canvas.translate(example["left"][i], example["top"][i])

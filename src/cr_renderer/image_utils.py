@@ -13,7 +13,6 @@ def encode_surface(surface: skia.Surface, format: str) -> bytes:
 
 
 def encode_skia_image(image: skia.Image, format: str) -> bytes:
-    print(format)
     """Convert skia.Image to bytes."""
     formats = dict(png=skia.kPNG, jpeg=skia.kJPEG)
     with io.BytesIO() as f:

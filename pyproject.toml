@@ -5,8 +5,8 @@ description = "Document renderer for the crello dataset."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "datasets[vision]>=2.14.0,<3.0",
-    "pydantic>=2.5.2,<3.0.0",
+    "datasets[vision]>=2.14.0",
+    "pydantic>=2.5.2",
     "skia-python>=120.0b5",
 ]
 
